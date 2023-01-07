@@ -1,7 +1,6 @@
 use std::{
-    error::Error,
     fs::File,
-    thread::{self, spawn},
+    thread::{self},
     time,
 };
 
@@ -132,7 +131,9 @@ impl TwitterFetcher {
                 true => format!("https://api.twitter.com/2/tweets/search/all?query={}&start_time={}&end_time={}&max_results=100&tweet.fields=id,text,edit_history_tweet_ids,created_at&user.fields=id,name,username,location", self.tag, start_date, end_date),
                 false => format!("https://api.twitter.com/2/tweets/search/all?query={}&start_time={}&end_time={}&max_results=100&tweet.fields=id,text,edit_history_tweet_ids,created_at&user.fields=id,name,username,location&next_token={}", self.tag, start_date, end_date, next_token),
             };
+        println!("{}", url);
 
+        self.rate_limiter.acquire_one();
         let res: TweetResponse = self
             .cli
             .get(url)
