@@ -1,5 +1,7 @@
 use std::{
+    error::Error,
     fs::File,
+    io::Write,
     thread::{self},
     time,
 };
@@ -22,6 +24,8 @@ struct Metadata {
     newest_id: String,
     oldest_id: String,
     result_count: u32,
+
+    #[serde(default)]
     next_token: String,
 }
 
@@ -76,11 +80,11 @@ impl TwitterFetcher {
         }
     }
 
-    fn fetch_month(&self, year: u32, month: u32) {
+    fn fetch_month(&self, year: u32, month: u32) -> Result<(), Box<dyn Error>> {
         let start_date = format!("{}-{:02}-01T00:00:00Z", year, month);
         let mut end_year = year;
         let mut end_month = month + 1;
-        let mut next_token = String::new();
+        let mut next_token = String::from("");
         match end_month {
             13 => {
                 end_year += 1;
@@ -91,6 +95,7 @@ impl TwitterFetcher {
 
         let end_date = format!("{}-{:02}-01T00:00:00Z", end_year, end_month);
 
+        let mut file = File::create(format!("{}-{:02}.txt", year, month))?;
         let mut csv_file = Writer::from_path(format!("{}-{:02}.csv", year, month)).unwrap();
         let res = self.fetch(&start_date, &end_date, &next_token).unwrap();
         next_token = match res.meta.is_none() {
@@ -109,15 +114,18 @@ impl TwitterFetcher {
                 false => {
                     for d in res.data.unwrap().as_slice() {
                         csv_file.write_record(&[&d.id, &d.created_at, &d.text]);
+                        file.write_all(d.text.as_bytes());
+                        file.write_all(b"\n");
                     }
-                    csv_file.flush();
                 }
 
                 true => {}
             };
         }
+        csv_file.flush();
 
         println!("finished fetching {}-{:02} data", year, month);
+        Ok(())
     }
 
     fn fetch(
