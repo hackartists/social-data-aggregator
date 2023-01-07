@@ -107,11 +107,12 @@ impl TwitterFetcher {
                     };
 
                     if next_token.is_empty() {
-                        break;
+                        return Ok(());
                     }
                 }
                 Err(e) => {
                     println!("Error: {}", e.to_string());
+                    thread::sleep(time::Duration::from_secs(60 * 15));
                     continue;
                 }
             }
@@ -135,7 +136,6 @@ impl TwitterFetcher {
             };
         println!("{}", url);
 
-        self.rate_limiter.acquire_one().await;
         let res = self.cli.get(url).headers(self.headers.clone()).send()?;
         match res.status() {
             StatusCode::OK => Ok(res.json::<TweetResponse>().unwrap()),
