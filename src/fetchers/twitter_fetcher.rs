@@ -1,5 +1,6 @@
 use std::{
     error::Error,
+    fmt::format,
     fs::File,
     io::Write,
     thread::{self},
@@ -8,7 +9,10 @@ use std::{
 
 use csv::Writer;
 use leaky_bucket::RateLimiter;
-use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION};
+use reqwest::{
+    header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION},
+    StatusCode,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -48,7 +52,7 @@ pub struct TwitterFetcher {
 }
 
 impl TwitterFetcher {
-    pub fn start(&self) {
+    pub async fn start(&self) {
         let mut year = self.from_date / 100;
         let mut month = self.from_date % 100;
         let end_year = self.end_date / 100;
@@ -59,7 +63,7 @@ impl TwitterFetcher {
 
         while year <= end_year {
             while !is_last_month(year, month) && month <= 12 {
-                self.fetch_month(year, month);
+                self.fetch_month(year, month).await;
                 month += 1;
             }
             month = 1;
@@ -67,20 +71,7 @@ impl TwitterFetcher {
         }
     }
 
-    async fn write_records(&self, file: &mut Writer<File>, data: Option<Vec<TweetData>>) {
-        match data.is_none() {
-            false => {
-                for d in data.unwrap().as_slice() {
-                    file.write_record(&[&d.id, &d.created_at, &d.text]);
-                }
-                file.flush();
-            }
-
-            true => {}
-        }
-    }
-
-    fn fetch_month(&self, year: u32, month: u32) -> Result<(), Box<dyn Error>> {
+    async fn fetch_month(&self, year: u32, month: u32) -> Result<(), Box<dyn Error>> {
         let start_date = format!("{}-{:02}-01T00:00:00Z", year, month);
         let mut end_year = year;
         let mut end_month = month + 1;
@@ -97,30 +88,33 @@ impl TwitterFetcher {
 
         let mut file = File::create(format!("{}-{:02}.txt", year, month))?;
         let mut csv_file = Writer::from_path(format!("{}-{:02}.csv", year, month)).unwrap();
-        let res = self.fetch(&start_date, &end_date, &next_token).unwrap();
-        next_token = match res.meta.is_none() {
-            true => String::from(""),
-            false => res.meta.unwrap().next_token,
-        };
 
-        while !next_token.is_empty() {
+        loop {
             thread::sleep(time::Duration::from_secs(1));
-            let res = self.fetch(&start_date, &end_date, &next_token).unwrap();
-            next_token = match res.meta.is_none() {
-                true => String::from(""),
-                false => res.meta.unwrap().next_token,
-            };
-            match res.data.is_none() {
-                false => {
-                    for d in res.data.unwrap().as_slice() {
-                        csv_file.write_record(&[&d.id, &d.created_at, &d.text]);
-                        file.write_all(d.text.as_bytes());
-                        file.write_all(b"\n");
+            let res = self.fetch(&start_date, &end_date, &next_token).await;
+            match res {
+                Ok(data) => {
+                    next_token = match data.meta.is_none() {
+                        true => String::from(""),
+                        false => data.meta.unwrap().next_token,
+                    };
+                    if let false = data.data.is_none() {
+                        for d in data.data.unwrap().as_slice() {
+                            csv_file.write_record(&[&d.id, &d.created_at, &d.text]);
+                            file.write_all(d.text.as_bytes());
+                            file.write_all(b"\n");
+                        }
+                    };
+
+                    if next_token.is_empty() {
+                        break;
                     }
                 }
-
-                true => {}
-            };
+                Err(e) => {
+                    println!("Error: {}", e.to_string());
+                    continue;
+                }
+            }
         }
         csv_file.flush();
 
@@ -128,12 +122,12 @@ impl TwitterFetcher {
         Ok(())
     }
 
-    fn fetch(
+    async fn fetch(
         &self,
         start_date: &String,
         end_date: &String,
         next_token: &String,
-    ) -> Result<TweetResponse, Box<dyn std::error::Error>> {
+    ) -> Result<TweetResponse, Box<dyn Error>> {
         let  url =
             match next_token.is_empty() {
                 true => format!("https://api.twitter.com/2/tweets/search/all?query={}&start_time={}&end_time={}&max_results=100&tweet.fields=id,text,edit_history_tweet_ids,created_at&user.fields=id,name,username,location", self.tag, start_date, end_date),
@@ -141,16 +135,12 @@ impl TwitterFetcher {
             };
         println!("{}", url);
 
-        self.rate_limiter.acquire_one();
-        let res: TweetResponse = self
-            .cli
-            .get(url)
-            .headers(self.headers.clone())
-            .send()?
-            .json()
-            .unwrap();
-
-        Ok(res)
+        self.rate_limiter.acquire_one().await;
+        let res = self.cli.get(url).headers(self.headers.clone()).send()?;
+        match res.status() {
+            StatusCode::OK => Ok(res.json::<TweetResponse>().unwrap()),
+            _ => Err(format!("{}", res.status()))?,
+        }
     }
 }
 
