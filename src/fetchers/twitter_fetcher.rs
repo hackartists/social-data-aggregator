@@ -25,7 +25,10 @@ struct TweetData {
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Metadata {
+    #[serde(default)]
     newest_id: String,
+
+    #[serde(default)]
     oldest_id: String,
     result_count: u32,
 
@@ -85,7 +88,6 @@ impl TwitterFetcher {
         }
 
         let end_date = format!("{}-{:02}-01T00:00:00Z", end_year, end_month);
-
         let mut file = File::create(format!("{}-{:02}.txt", year, month))?;
         let mut csv_file = Writer::from_path(format!("{}-{:02}.csv", year, month)).unwrap();
 
