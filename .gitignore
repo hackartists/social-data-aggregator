@@ -1,1 +1,6 @@
 /target
+/*.csv
+/*.txt
+/es/
+/lang/
+*.log
