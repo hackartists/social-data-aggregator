@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import os
 from wordcloud import WordCloud
@@ -29,7 +30,9 @@ class LdaTopicModeling:
         df = []
         while date <= end_date:
             filename = "raw-data/pd-{0}-{1:02d}.csv".format(year,month)
-            df.append(pd.read_csv(filename, header=None, names=['ts','date','text']))
+            d = pd.read_csv(filename, engine='python' )
+            d= d[d['language'] == 'en']
+            df.append(d)
 
             month = month + 1
             if month == 13:
@@ -41,18 +44,27 @@ class LdaTopicModeling:
     def preproc(self, text):
         lines = [ l for l in text.split('\n') ]
         lines = ' '.join(lines)
-        lines = re.sub("(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])"," ",lines.lower())
-        lines = re.sub("[^a-zA-Z]"," ",lines.lower())
-        lines = re.sub("[ ]+"," ",lines.lower())
-        lines = re.sub("smart contract","smartcontract",lines.lower())
-        lines = re.sub("smart contracts","smartcontract",lines.lower())
+        converts = [
+            ('[^a-zA-Z ]',''),
+            (r'http\S+', ''),
+            (r'https\S+', ''),
+            ("smart contract","smartcontract"),
+            ("smart contracts","smartcontract"),
+            ("smartcontracts","smartcontract"),
+            ("amp", ""),
+            ("[ ]+"," "),
+        ]
+
+        for (src,dst) in converts:
+            lines = re.sub(src,dst,lines, flags=re.IGNORECASE)
+
         lines = re.findall('\w{2,}', lines)
         lines = ' '.join([x for x in lines])
 
         return lines
 
     def preprocessing(self):
-        self.data['text'].map(self.preproc)
+        self.data = self.data['text'].map(self.preproc)
 
     def wordcloud(self):
         long_string = ','.join(list(self.data['text'].values))
@@ -74,7 +86,7 @@ class LdaTopicModeling:
                     if word not in stop_words] for doc in texts]
 
 
-        data = self.data.text.values.tolist()
+        data = self.data.values.tolist()
         data_words = list(sent_to_words(data))
         data_words = remove_stopwords(data_words)
 

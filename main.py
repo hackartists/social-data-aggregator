@@ -1,11 +1,11 @@
-import os
-import re
+# import os
+# import re
 
-import nltk
-import nltk.corpus
-import numpy as np
-import pandas as pd
-from nltk.tokenize import word_tokenize
+# import nltk
+# import nltk.corpus
+# import numpy as np
+# import pandas as pd
+# from nltk.tokenize import word_tokenize
 import frequency
 import detector
 import lda
@@ -52,5 +52,14 @@ import lda
 #         date = (year*100) + month
 #     data = pd.concat(df)
 
-generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
-[ lda.LdaTopicModeling(s, e).run(10, f'lda-{g}') for (g,s,e) in generations ]
+# generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
+generations = [('gen3',202004,202212)]
+
+for (g,s,e) in generations:
+    l = lda.LdaTopicModeling(s, e)
+    l = l.run(10, f'lda-{g}')
+    # l.load()
+    # l.preprocessing()
+    # print(l.data.to_list())
+    # l.analysis(10)
+    # l.visualize(f'lda-{g}')
