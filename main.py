@@ -9,8 +9,9 @@
 import frequency
 import detector
 import lda
+import warnings
 
-
+warnings.filterwarnings("ignore",category=DeprecationWarning)
 # files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
 # print(files)
 # for f in files:
@@ -52,14 +53,13 @@ import lda
 #         date = (year*100) + month
 #     data = pd.concat(df)
 
-# generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
-generations = [('gen3',202004,202212)]
+generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
+# generations = [('gen3',202004,202212)]
 
 for (g,s,e) in generations:
+    f = frequency.FrequencyMining(s, e)
+    f.run(f'freq-{g}.csv')
+    print(f'{g}: frequency has been completed.\n')
     l = lda.LdaTopicModeling(s, e)
     l = l.run(10, f'lda-{g}')
-    # l.load()
-    # l.preprocessing()
-    # print(l.data.to_list())
-    # l.analysis(10)
-    # l.visualize(f'lda-{g}')
+    print(f'{g}: LDA topic modeling has been completed.\n')

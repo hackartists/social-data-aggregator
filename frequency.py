@@ -10,11 +10,9 @@ from nltk.corpus import stopwords
 # from nltk.stem import PorterStemmer
 from nltk.probability import FreqDist
 import csv
+import text_processor as tp
 
-# nltk.download('stopwords')
-# nltk.download('wordnet')
-
-class FrequencyMining:
+class FrequencyMining(tp.TextProcessor):
     def __init__(self, start_date, end_date):
         self.start_date = start_date
         self.end_date = end_date
@@ -45,23 +43,10 @@ class FrequencyMining:
         return lines
 
     def preprocessing(self, text):
-        lines = [ l for l in text.split('\n') ]
-        lines = ' '.join(lines)
-        lines = re.sub("(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])"," ",lines.lower())
-        lines = re.sub("[^a-zA-Z]"," ",lines.lower())
-        lines = re.sub("[ ]+"," ",lines.lower())
-        lines = re.sub("smart contract","smartcontract",lines.lower())
-        lines = re.sub("smart contracts","smartcontract",lines.lower())
-        lines = re.findall('\w{2,}', lines)
-        lines = ' '.join([x for x in lines])
-
-        return lines
+        return self.preproc(text)
 
     def tokenization(self, text):
-        # pst = PorterStemmer()
-        a = set(stopwords.words('english'))
-        token = [ x for x in word_tokenize(text.lower()) if x not in a ]
-        # token = [ pst.stem(x) for x in token ]
+        token = [ self.lemmatization(x) for x in word_tokenize(text.lower()) if x not in self.stopwords() ]
 
         return token
 

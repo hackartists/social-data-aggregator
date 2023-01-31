@@ -9,11 +9,12 @@ from nltk.corpus import stopwords
 import gensim.corpora as corpora
 from pprint import pprint
 import pyLDAvis.gensim_models as gensimvis
-import pickle 
+import pickle
 import pyLDAvis
+import text_processor as tp
+from nltk.stem import WordNetLemmatizer, SnowballStemmer
 
-
-class LdaTopicModeling:
+class LdaTopicModeling(tp.TextProcessor):
     def __init__(self, start_date, end_date):
         self.start_date = start_date
         self.end_date = end_date
@@ -41,49 +42,27 @@ class LdaTopicModeling:
             date = (year*100) + month
         self.data = pd.concat(df)
 
-    def preproc(self, text):
-        lines = [ l for l in text.split('\n') ]
-        lines = ' '.join(lines)
-        converts = [
-            ('[^a-zA-Z ]',''),
-            (r'http\S+', ''),
-            (r'https\S+', ''),
-            ("smart contract","smartcontract"),
-            ("smart contracts","smartcontract"),
-            ("smartcontracts","smartcontract"),
-            ("amp", ""),
-            ("[ ]+"," "),
-        ]
-
-        for (src,dst) in converts:
-            lines = re.sub(src,dst,lines, flags=re.IGNORECASE)
-
-        lines = re.findall('\w{2,}', lines)
-        lines = ' '.join([x for x in lines])
-
-        return lines
-
     def preprocessing(self):
         self.data = self.data['text'].map(self.preproc)
 
     def wordcloud(self):
-        long_string = ','.join(list(self.data['text'].values))
+        long_string = ','.join(list(self.data.values))
         wordcloud = WordCloud(background_color="white", max_words=1000, contour_width=3, contour_color='steelblue')
 
         wordcloud.generate(long_string)
         wordcloud.to_image()
 
     def analysis(self, num_topics):
-        stop_words = stopwords.words('english')
-        stop_words.extend(['from', 'subject', 're', 'edu', 'use'])
+        stop_words = self.stopwords()
+        stop_words.extend(['ethereum','bitcoin','binance','solana','blockchain'])
 
         def sent_to_words(sentences):
             for sentence in sentences:
                 yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))
 
         def remove_stopwords(texts):
-            return [[word for word in simple_preprocess(str(doc)) 
-                    if word not in stop_words] for doc in texts]
+            return [[ self.lemmatization(word) for word in simple_preprocess(str(doc))
+                     if word not in stop_words] for doc in texts]
 
 
         data = self.data.values.tolist()
@@ -95,8 +74,9 @@ class LdaTopicModeling:
         self.corpus = [self.id2word.doc2bow(text) for text in self.texts]
 
         self.lda_model = gensim.models.LdaMulticore(corpus=self.corpus,
-                                            id2word=self.id2word,
-                                            num_topics=num_topics)
+                                                    id2word=self.id2word,
+                                                    num_topics=num_topics,
+                                                    workers=7)
         # pprint(lda_model.print_topics())
         # doc_lda = lda_model[corpus]
 
