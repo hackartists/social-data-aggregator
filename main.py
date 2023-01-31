@@ -1,36 +1,56 @@
 import os
+import re
 
-from langdetect import detect
+import nltk
+import nltk.corpus
+import numpy as np
+import pandas as pd
+from nltk.tokenize import word_tokenize
+import frequency
+import detector
+import lda
 
 
-def d(line):
-    try:
-        return detect(line)
-    except:
-        return "unknown"
+# files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
+# print(files)
+# for f in files:
+#     print(f"starting to parse {f}")
+#     convert(f)
+#     print(f"finished parsing {f}")
 
-def convert(file):
-    f = open(file)
-    lines = f.read()
-    f.close()
-    lines = [ (l, d(l)) for l in lines.split('\n') ]
-    dic = {}
-    for (line, lang) in lines:
-        val = dic.get(lang,[])
-        dic[lang] = val + [line]
-    for k in dic.keys():
-        dir= f"lang/{k}"
-        os.makedirs(dir, exist_ok=True)
-        wf=open(f"{dir}/{file}", "w")
-        wf.write("\n".join(dic[k]))
-        wf.close()
-        print(f"finished on {dir}/{file}")
+# print("finished all")
 
-files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
-print(files)
-for f in files:
-    print(f"starting to parse {f}")
-    convert(f)
-    print(f"finished parsing {f}")
+# f = FrequencyMining(201604, 201801)
+# ret = f.run("test-gen1.csv")
 
-print("finished all")
+# l = LanguageDetector('raw-data/2016-04.csv')
+
+# l = LdaTopicModeling(201604, 201801)
+# l.run(10, 'lda_gen1')
+
+# def convert():
+#     start_date = 201605
+#     end_date = 202212
+
+#     month = start_date % 100
+#     end_month = end_date % 100
+#     year = int(start_date / 100)
+#     date = start_date
+#     lines = ""
+#     df = []
+#     ll = detector.LanguageDetector()
+#     while date <= end_date:
+#         filename = "raw-data/{0}-{1:02d}.csv".format(year,month)
+#         output = "raw-data/pd-{0}-{1:02d}.csv".format(year,month)
+#         ll.convert(filename, output)
+#         print(f'{filename} -> {output} was completed\n')
+
+#         month = month + 1
+#         if month == 13:
+#             month = 1
+#             year = year + 1
+#         date = (year*100) + month
+#     data = pd.concat(df)
+
+generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
+[ lda.LdaTopicModeling(s, e).run(10, f'lda-{g}') for (g,s,e) in generations ]
