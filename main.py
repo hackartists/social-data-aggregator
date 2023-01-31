@@ -58,8 +58,8 @@ generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,2022
 
 for (g,s,e) in generations:
     f = frequency.FrequencyMining(s, e)
-    f.run(f'freq-{g}.csv')
+    f.run(f'output/freq-{g}.csv')
     print(f'{g}: frequency has been completed.\n')
     l = lda.LdaTopicModeling(s, e)
-    l = l.run(10, f'lda-{g}')
+    l = l.run(10, f'output/lda-{g}')
     print(f'{g}: LDA topic modeling has been completed.\n')

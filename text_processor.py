@@ -12,7 +12,7 @@ class TextProcessor:
         ])
         return stop_words
 
-    def lemmatization(text):
+    def lemmatization(self,text):
         lemmatizer = WordNetLemmatizer()
         return lemmatizer.lemmatize(text)
 
