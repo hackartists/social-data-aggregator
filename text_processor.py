@@ -1,5 +1,6 @@
 import re
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer, SnowballStemmer
 
 class TextProcessor:
     def stopwords(self):

@@ -12,7 +12,6 @@ import pyLDAvis.gensim_models as gensimvis
 import pickle
 import pyLDAvis
 import text_processor as tp
-from nltk.stem import WordNetLemmatizer, SnowballStemmer
 
 class LdaTopicModeling(tp.TextProcessor):
     def __init__(self, start_date, end_date):
