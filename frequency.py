@@ -54,7 +54,7 @@ class FrequencyMining(tp.TextProcessor):
         ignore_words = ["dao","http","https", "rt", "via", "amp", "great", "good", "back", "con","get","go","based","become","today","like"]
         tokens = [x for x in tokens if x not in ignore_words]
         fdist = FreqDist(tokens)
-        fdist1 = fdist.most_common(60)
+        fdist1 = fdist.most_common(200)
         return fdist1
 
     def text_mining(self):
