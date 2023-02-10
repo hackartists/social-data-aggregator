@@ -6,7 +6,7 @@ class TextProcessor:
     def stopwords(self):
         stop_words = stopwords.words('english')
         stop_words.extend([
-            'amp', 'eth', 'dao', 'daos', 'rt', 'us', 'one',
+            'amp', 'dao', 'daos', 'rt', 'us', 'one',
             'via', 'great', 'good','back','get','best'
             'go','based','today','like','theres','dont',
             'anywhere','done','time','join'
@@ -14,8 +14,9 @@ class TextProcessor:
         return stop_words
 
     def lemmatization(self,text):
-        lemmatizer = WordNetLemmatizer()
-        return lemmatizer.lemmatize(text)
+        # lemmatizer = WordNetLemmatizer()
+        # return lemmatizer.lemmatize(text)
+        return text
 
     def preproc(self, text):
         lines = [ l for l in text.split('\n') ]

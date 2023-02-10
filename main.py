@@ -53,8 +53,9 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 #         date = (year*100) + month
 #     data = pd.concat(df)
 
-generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
+# generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
 # generations = [('gen3',202004,202212)]
+generations = [('gen',201604,202212)]
 
 for (g,s,e) in generations:
     f = frequency.FrequencyMining(s, e)
