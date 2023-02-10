@@ -28,7 +28,7 @@ class FrequencyMining(tp.TextProcessor):
         date = start_date
         lines = ""
         while date <= end_date:
-            filename = "en/{0}-{1:02d}.txt".format(year,month)
+            filename = "raw-data/{0}-{1:02d}.txt".format(year,month)
             f = open(filename,"r")
             lines = lines + f.read()
             f.close()
