@@ -7,9 +7,9 @@ class TextProcessor:
         stop_words = stopwords.words('english')
         stop_words.extend([
             'amp', 'dao', 'daos', 'rt', 'us', 'one',
-            'via', 'great', 'good','back','get','best'
-            'go','based','today','like','theres','dont',
-            'anywhere','done','time','join'
+            'via', 'great', 'good','back','get','best',
+            'based','today','like','theres','dont',
+            'anywhere','done','time'
         ])
         return stop_words
 
@@ -28,6 +28,13 @@ class TextProcessor:
                 'smart contracts',
                 'smartcontracts',
             ], True),
+            ('companion', ['cmpn'], True),
+            ('hypernation8', ['hypernation'], True),
+            ('whitelist', ['wl'], True),
+            ('world', ['worlds'], True),
+            ('luna', ['lunac'], True),
+            ('tag', ['tg'], True),
+            ('event', ['events'], True),
             ('',[r'http\S+', r'https\S+', '[0-9]+',],True),
             ('dapp',['dapps'],True),
             ('solana',['sol'],True),
