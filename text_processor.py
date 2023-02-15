@@ -9,7 +9,8 @@ class TextProcessor:
             'amp', 'dao', 'daos', 'rt', 'us', 'one',
             'via', 'great', 'good','back','get','best',
             'based','today','like','theres','dont',
-            'anywhere','done','time'
+            'anywhere','done','time',
+            'hello','im', 'retweet'
         ])
         return stop_words
 
@@ -23,6 +24,9 @@ class TextProcessor:
         lines = ' '.join(lines)
         converts = [
             ('', ['[^a-zA-Z0-9 ]'], False),
+            ('giveaway',['nftgiveaway', 'give away'], True),
+            ('bnb',['bnbchain'], True),
+            ('xhashtag',['xtag'], True),
             ('smartcontract', [
                 'smart contract',
                 'smart contracts',
@@ -32,7 +36,7 @@ class TextProcessor:
             ('hypernation8', ['hypernation'], True),
             ('whitelist', ['wl'], True),
             ('world', ['worlds'], True),
-            ('luna', ['lunac'], True),
+            ('luna', ['lunac', 'lunc'], True),
             ('tag', ['tg'], True),
             ('event', ['events'], True),
             ('',[r'http\S+', r'https\S+', '[0-9]+',],True),
