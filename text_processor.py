@@ -24,7 +24,7 @@ class TextProcessor:
         lines = ' '.join(lines)
         converts = [
             ('', ['[^a-zA-Z0-9 ]'], False),
-            ('giveaway',['nftgiveaway', 'give away'], True),
+            ('airdrop',['gitveaway','nftgiveaway', 'give away'], True),
             ('bnb',['bnbchain', 'bsc'], True),
             ('xhashtag',['xtag'], True),
             ('smartcontract', [
