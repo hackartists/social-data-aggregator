@@ -25,7 +25,7 @@ class TextProcessor:
         converts = [
             ('', ['[^a-zA-Z0-9 ]'], False),
             ('giveaway',['nftgiveaway', 'give away'], True),
-            ('bnb',['bnbchain'], True),
+            ('bnb',['bnbchain', 'bsc'], True),
             ('xhashtag',['xtag'], True),
             ('smartcontract', [
                 'smart contract',
@@ -45,7 +45,7 @@ class TextProcessor:
             ('reward',['rewards'],True),
             ('token',['tokens'],True),
             ('nft',['nfts'],True),
-            ('binance',['bsc'],True),
+            ('community',['nftcommunity'],True),
             ('ethereum',[
                 'eth',
                 'ether'

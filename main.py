@@ -7,6 +7,7 @@
 # import pandas as pd
 # from nltk.tokenize import word_tokenize
 import frequency
+import datapool
 import detector
 import lda
 import warnings
@@ -56,6 +57,8 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 # generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
 # generations = [('gen3',202004,202212)]
 generations = [('gen',201604,202212)]
+# d = datapool.DataPool(201604,202212)
+# d.load()
 
 for (g,s,e) in generations:
     f = frequency.FrequencyMining(s, e)
