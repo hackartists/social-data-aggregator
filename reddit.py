@@ -44,4 +44,5 @@ class Reddit:
                 year = year + 1
             date = (year*100) + month
 
-    def filter(self, filename):
+    # def filter(self, filename):
+
