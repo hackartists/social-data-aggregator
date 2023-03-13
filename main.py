@@ -11,6 +11,7 @@ import datapool
 import detector
 import lda
 import warnings
+import reddit
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 # files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
@@ -60,10 +61,13 @@ generations = [('gen',201604,202212)]
 # d = datapool.DataPool(201604,202212)
 # d.load()
 
-for (g,s,e) in generations:
-    f = frequency.FrequencyMining(s, e)
-    f.run(f'output/freq-{g}.csv')
-    print(f'{g}: frequency has been completed.\n')
-    l = lda.LdaTopicModeling(s, e)
-    l = l.run(10, f'output/lda-{g}')
-    print(f'{g}: LDA topic modeling has been completed.\n')
+# for (g,s,e) in generations:
+#     f = frequency.FrequencyMining(s, e)
+#     f.run(f'output/freq-{g}.csv')
+#     print(f'{g}: frequency has been completed.\n')
+#     l = lda.LdaTopicModeling(s, e)
+#     l = l.run(10, f'output/lda-{g}')
+#     print(f'{g}: LDA topic modeling has been completed.\n')
+
+r = reddit.Reddit(201604, 202212, "dao")
+r.download()
