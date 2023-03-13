@@ -36,7 +36,6 @@ class Reddit:
                         #if chunk: 
                         f.write(chunk)
                 print("downloaded {0}".format(local_filename))
-                self.unzip(local_filename)
 
 
             month = month + 1
@@ -45,3 +44,4 @@ class Reddit:
                 year = year + 1
             date = (year*100) + month
 
+    def filter(self, filename):
