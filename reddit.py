@@ -8,11 +8,20 @@ class Reddit:
         self.end_date = end_date
         self.keyword = keyword
 
-    def unzip(self, filename):
-        res = command.run(['zstd', '-d', filename])
+    def unzip(self):
+        start_date = self.start_date
+        end_date = self.end_date
 
-        print(res.output)
-        print(res.exit)
+        month = start_date % 100
+        end_month = end_date % 100
+        year = int(start_date / 100)
+        date = start_date
+        lines = ""
+        while date <= end_date:
+            filename = "reddit/RS_{0}-{1:02d}.zst".format(year,month)
+            res = command.run(['zstd', '-d', filename])
+            print(res.output)
+            print(res.exit)
 
     def download(self):
         start_date = self.start_date

@@ -71,3 +71,4 @@ generations = [('gen',201604,202212)]
 
 r = reddit.Reddit(201604, 202212, "dao")
 r.download()
+r.unzip()
