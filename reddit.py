@@ -24,18 +24,16 @@ class Reddit:
             filename = "reddit/{0}.zst".format(base_filename)
             print("Extracting {0}".format(filename))
             start = time.time()
+            res = subprocess.getoutput('zstd -d {0}'.format(filename))
             res = command.run(['zstd', '-d', filename])
             elapsed = time.time() - start
-            if res.exit == 0:
-                print("{1}s: Successful extraction ({0})".format(filename,elapsed))
-                print("Starting to filter {0} from {0}".format(self.keyword, base_filename))
-                start = time.time()
-                res = subprocess.getoutput('cat reddit/{0} | grep \'"subreddit":"dao"\' > reddit/{0}.txt'.format(base_filename))
-                elapsed = time.time() - start
-                print("{1}s: Saved the filtered output to reddit/{0}.txt".format(base_filename, elapsed))
-                subprocess.getoutput('sudo rm -rf reddit/{0}'.format(base_filename))
-            else:
-                print("Failed to extract {0}".format(filename))
+            print("{1}s: Successful extraction ({0})".format(filename,elapsed))
+            print("Starting to filter {0} from {0}".format(self.keyword, base_filename))
+            start = time.time()
+            res = subprocess.getoutput('cat reddit/{0} | grep \'"subreddit":"dao"\' > reddit/{0}.txt'.format(base_filename))
+            elapsed = time.time() - start
+            print("{1}s: Saved the filtered output to reddit/{0}.txt".format(base_filename, elapsed))
+            subprocess.getoutput('sudo rm -rf reddit/{0}'.format(base_filename))
 
             month = month + 1
             if month == 13:
