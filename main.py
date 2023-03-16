@@ -70,5 +70,4 @@ generations = [('gen',201604,202212)]
 #     print(f'{g}: LDA topic modeling has been completed.\n')
 
 r = reddit.Reddit(201604, 202212, "dao")
-r.download()
-r.unzip()
+r.extract_subreddit()
