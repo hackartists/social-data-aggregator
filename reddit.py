@@ -23,7 +23,7 @@ class Reddit:
             filename = "reddit/{0}.zst".format(base_filename)
             print("Extracting {0}".format(filename))
             start = time.time()
-            subprocess.getoutput('zstd -d {0}'.format(filename))
+            subprocess.getoutput('zstd -d {0} --long=31'.format(filename))
             elapsed = time.time() - start
             print("{1}s: Successful extraction ({0})".format(filename,elapsed))
             print("Starting to filter {0} from {0}".format(self.keyword, base_filename))
