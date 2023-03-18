@@ -69,5 +69,5 @@ generations = [('gen',201604,202212)]
 #     l = l.run(10, f'output/lda-{g}')
 #     print(f'{g}: LDA topic modeling has been completed.\n')
 
-r = reddit.Reddit(201604, 202212, "dao")
+r = reddit.Reddit(201611, 201611, "dao")
 r.extract_subreddit()

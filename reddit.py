@@ -23,14 +23,19 @@ class Reddit:
             filename = "reddit/{0}.zst".format(base_filename)
             print("Extracting {0}".format(filename))
             start = time.time()
-            subprocess.getoutput('zstd -d {0} --long=31'.format(filename))
+            # subprocess.getoutput('zstd -d {0} --long=31'.format(filename))
             elapsed = time.time() - start
             print("{1}s: Successful extraction ({0})".format(filename,elapsed))
             print("Starting to filter {0} from {0}".format(self.keyword, base_filename))
             start = time.time()
-            res = subprocess.getoutput('cat reddit/{0} | grep \'"subreddit":"dao"\' > reddit/{0}.txt'.format(base_filename))
+            with open('reddit/{0}'.format(base_filename)) as f:
+                k = '"subreddit":"{0}"'.format(self.keyword)
+                with open('reddit/python-{0}.txt'.format(base_filename)) as w:
+                    for line in f:
+                        if k in line:
+                            w.write(line)
             elapsed = time.time() - start
-            print("{1}s: Saved the filtered output to reddit/{0}.txt".format(base_filename, elapsed))
+            print("{1}s: Saved the filtered output to reddit/python-{0}.txt".format(base_filename, elapsed))
             subprocess.getoutput('sudo rm -rf reddit/{0}'.format(base_filename))
 
             month = month + 1
