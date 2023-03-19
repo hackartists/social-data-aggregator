@@ -23,17 +23,25 @@ class Reddit:
             filename = "reddit/{0}.zst".format(base_filename)
             print("Extracting {0}".format(filename))
             start = time.time()
-            # subprocess.getoutput('zstd -d {0} --long=31'.format(filename))
+            subprocess.getoutput('zstd -d {0} --long=31'.format(filename))
             elapsed = time.time() - start
             print("{1}s: Successful extraction ({0})".format(filename,elapsed))
             print("Starting to filter {0} from {0}".format(self.keyword, base_filename))
             start = time.time()
             with open('reddit/{0}'.format(base_filename)) as f:
-                k = '"subreddit":"{0}"'.format(self.keyword)
-                with open('reddit/python-{0}.txt'.format(base_filename)) as w:
+                # k = '"subreddit":"{0}"'.format(self.keyword)
+                k = '{0}'.format(self.keyword)
+                t = 0
+                with open('reddit/python-{0}.txt'.format(base_filename), 'w') as w:
                     for line in f:
-                        if k in line:
+                        t += 1
+                        obj = json.loads(line)
+                        meetsTitle = 'title' in obj and 'DAO' in obj['title']
+                        meetsSubreddit = 'subreddit' in obj and k in obj['subreddit']
+
+                        if meetsTitle or meetsSubreddit:
                             w.write(line)
+                print('total lines: {0}'.format(t))
             elapsed = time.time() - start
             print("{1}s: Saved the filtered output to reddit/python-{0}.txt".format(base_filename, elapsed))
             subprocess.getoutput('sudo rm -rf reddit/{0}'.format(base_filename))
