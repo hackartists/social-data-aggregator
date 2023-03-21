@@ -82,4 +82,38 @@ class Reddit:
                 year = year + 1
             date = (year*100) + month
 
+    def toCsv(self):
+        month = start_date % 100
+        end_month = end_date % 100
+        year = int(start_date / 100)
+        date = start_date
+        lines = ""
+        df = []
+        ll = detector.LanguageDetector()
+        while date <= end_date:
+            filename = 'reddit/python-RS_{0}-{1:02d}.json'.format(year,month)
+            output = 'reddit/pd-{0}-{1:02d}.csv'.format(year,month)
+            with open(fillename) as f:
+                with open(output, 'w') as w:
+                    fieldnames = ['timestamp', 'date', 'text', 'language']
+                    cf = csv.DictWriter(w, fieldnames=fieldnames)
+                    cf.writeheader()
+
+                    for line in f:
+                        obj = json.loads(line)
+                        text = obj['title']
+                        if obj['selftext'] != "":
+                            text = text + " " + obj['selftext']
+                        (langs,distance) = ll.model.predict(text)
+                        langs = [ ' '.join(l).replace('__label__', "") for l in langs ]
+                        cf.writerow([obj['created_utc'],'',text,langs ])
+
+            print(f'{filename} -> {output} was completed\n')
+
+            month = month + 1
+            if month == 13:
+                month = 1
+                year = year + 1
+            date = (year*100) + month
+        data = pd.concat(df)
 
