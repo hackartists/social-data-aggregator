@@ -13,10 +13,11 @@ import csv
 import text_processor as tp
 
 class FrequencyMining(tp.TextProcessor):
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, base='raw-data'):
         self.start_date = start_date
         self.end_date = end_date
         self.text = ""
+        self.base = base
 
     def load(self):
         start_date = self.start_date
@@ -28,7 +29,7 @@ class FrequencyMining(tp.TextProcessor):
         date = start_date
         lines = ""
         while date <= end_date:
-            filename = "raw-data/{0}-{1:02d}.txt".format(year,month)
+            filename = "{2}/{0}-{1:02d}.txt".format(year,month,self.base)
             f = open(filename,"r")
             lines = lines + f.read()
             f.close()

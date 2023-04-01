@@ -2,6 +2,9 @@ import requests
 import json
 import subprocess
 import time
+import detector
+import csv
+import datetime
 
 class Reddit:
     def __init__(self, start_date, end_date, keyword):
@@ -83,6 +86,9 @@ class Reddit:
             date = (year*100) + month
 
     def toCsv(self):
+        start_date = self.start_date
+        end_date = self.end_date
+
         month = start_date % 100
         end_month = end_date % 100
         year = int(start_date / 100)
@@ -91,9 +97,9 @@ class Reddit:
         df = []
         ll = detector.LanguageDetector()
         while date <= end_date:
-            filename = 'reddit/python-RS_{0}-{1:02d}.json'.format(year,month)
+            filename = 'reddit/python-RS_{0}-{1:02d}.txt'.format(year,month)
             output = 'reddit/pd-{0}-{1:02d}.csv'.format(year,month)
-            with open(fillename) as f:
+            with open(filename) as f:
                 with open(output, 'w') as w:
                     fieldnames = ['timestamp', 'date', 'text', 'language']
                     cf = csv.DictWriter(w, fieldnames=fieldnames)
@@ -104,9 +110,10 @@ class Reddit:
                         text = obj['title']
                         if obj['selftext'] != "":
                             text = text + " " + obj['selftext']
+                            text = text.replace('\n',' ')
                         (langs,distance) = ll.model.predict(text)
-                        langs = [ ' '.join(l).replace('__label__', "") for l in langs ]
-                        cf.writerow([obj['created_utc'],'',text,langs ])
+                        langs = [ l.replace('__label__', "") for l in langs ]
+                        cf.writerow({'timestamp': '{0}'.format(obj['created_utc']), 'date':'2000-01-01','text':'{0}'.format(text),'language':','.join(langs) })
 
             print(f'{filename} -> {output} was completed\n')
 
@@ -115,5 +122,37 @@ class Reddit:
                 month = 1
                 year = year + 1
             date = (year*100) + month
-        data = pd.concat(df)
 
+    def toText(self):
+        start_date = self.start_date
+        end_date = self.end_date
+
+        month = start_date % 100
+        end_month = end_date % 100
+        year = int(start_date / 100)
+        date = start_date
+        lines = ""
+        ll = detector.LanguageDetector()
+        while date <= end_date:
+            filename = 'reddit/python-RS_{0}-{1:02d}.txt'.format(year,month)
+            output = 'reddit/{0}-{1:02d}.txt'.format(year,month)
+            with open(filename) as f:
+                with open(output, 'w') as w:
+                    for line in f:
+                        obj = json.loads(line)
+                        text = obj['title']
+                        if obj['selftext'] != "":
+                            text = text + " " + obj['selftext']
+                            text = text.replace('\n',' ')
+                        (langs,distance) = ll.model.predict(text)
+                        langs = [ l.replace('__label__', "") for l in langs ]
+                        if langs.__contains__('en'):
+                            w.write('{0}\n'.format(text))
+
+            print(f'{filename} -> {output} was completed\n')
+
+            month = month + 1
+            if month == 13:
+                month = 1
+                year = year + 1
+            date = (year*100) + month

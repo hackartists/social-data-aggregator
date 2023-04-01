@@ -14,9 +14,10 @@ import pyLDAvis
 import text_processor as tp
 
 class LdaTopicModeling(tp.TextProcessor):
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, base='raw-data'):
         self.start_date = start_date
         self.end_date = end_date
+        self.base = base
 
     def load(self):
         start_date = self.start_date
@@ -29,7 +30,7 @@ class LdaTopicModeling(tp.TextProcessor):
         lines = ""
         df = []
         while date <= end_date:
-            filename = "raw-data/pd-{0}-{1:02d}.csv".format(year,month)
+            filename = "{2}/pd-{0}-{1:02d}.csv".format(year,month,self.base)
             d = pd.read_csv(filename, engine='python' )
             d= d[d['language'] == 'en']
             df.append(d)
