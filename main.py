@@ -12,6 +12,7 @@ import detector
 import lda
 import warnings
 import reddit
+import network
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 # files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
@@ -64,12 +65,16 @@ topics=20
 
 for (g,s,e) in generations:
     for base in ['reddit', 'raw-data']:
-        f = frequency.FrequencyMining(s, e, base)
-        f.run(f'output/freq-{base}-{g}.csv')
-        print(f'{g}: frequency has been completed.\n')
-        l = lda.LdaTopicModeling(s, e, base)
-        l = l.run(topics, f'output/lda-{base}-{g}')
-        print(f'{g}: LDA topic modeling has been completed.\n')
+        n=network.Network(s,e,base)
+        n.load()
+        n.save()
+        n.run()
+        # f = frequency.FrequencyMining(s, e, base)
+        # f.run(f'output/freq-{base}-{g}.csv')
+        # print(f'{g}: frequency has been completed.\n')
+        # l = lda.LdaTopicModeling(s, e, base)
+        # l = l.run(topics, f'output/lda-{base}-{g}')
+        # print(f'{g}: LDA topic modeling has been completed.\n')
 
 # r = reddit.Reddit(201604, 202212, "dao")
 # r.toCsv()

@@ -1,77 +1,309 @@
 import re
+
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer, SnowballStemmer
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
+
+reddit_top = {
+    "dao": True,
+    "nft": True,
+    "defi": True,
+    "locked": True,
+    "assets": True,
+    "tournaments": True,
+    "game": True,
+    "governance": True,
+    "access": True,
+    "story": True,
+    "metaverse": True,
+    "token": True,
+    "price": True,
+    "mint": True,
+    "wallet": True,
+    "momentum": True,
+    "project": True,
+    "blockchain": True,
+    "staking": True,
+    "vote": True,
+    "listed": True,
+    "airdrop": True,
+    "july": True,
+    "market": True,
+    "twitter": True,
+    "charges": True,
+    "community": True,
+    "decentralized": True,
+    "official": True,
+    "stablecoin": True,
+    "promotions": True,
+    "launch": True,
+    "chain": True,
+    "coin": True,
+    "space": True,
+    "rage": True,
+    "cryptocurrency": True,
+    "reward": True,
+    "links": True,
+    "latest": True,
+    "medical": True,
+    "bnb": True,
+    "victory": True,
+    "world": True,
+    "ownership": True,
+    "members": True,
+    "ethereum": True,
+    "platform": True,
+    "system": True,
+    "lost": True,
+    "fueled": True,
+    "solana": True,
+    "telegram": True,
+    "utility": True,
+    "cards": True,
+    "captain": True,
+    "usdq": True,
+    "liquidity": True,
+    "live": True,
+    "connections": True,
+    "snippet": True,
+    "astrosphere": True,
+    "buy": True,
+    "tech": True,
+    "network": True,
+    "rushes": True,
+    "field": True,
+    "event": True,
+    "makerdao": True,
+    "ape": True,
+    "chance": True,
+    "apollo": True,
+    "usa": True,
+    "development": True,
+    "dex": True,
+    "astrospherenft": True,
+    "discord": True,
+    "gas": True,
+    "protocol": True,
+    "majority": True,
+    "earn": True,
+    "smartcontract": True,
+    "ecosystem": True,
+    "exclusive": True,
+    "dai": True,
+    "presale": True,
+    "join": True,
+    "bitcoin": True,
+    "voting": True,
+    "tackle": True,
+    "supply": True,
+    "website": True,
+    "value": True,
+    "server": True,
+    "introduce": True,
+    "exchange": True,
+    "holders": True,
+    "kaiba": True,
+    "investment": True,
+    "host": True,
+    "marketing": True,
+}
+
+twitter = {
+    "dao": True,
+    "nft": True,
+    "xhashtag": True,
+    "lets": True,
+    "participate": True,
+    "trading": True,
+    "airdrop": True,
+    "decentralized": True,
+    "floki": True,
+    "price": True,
+    "ada": True,
+    "cryptocurrency": True,
+    "luna": True,
+    "bullish": True,
+    "companionto": True,
+    "listing": True,
+    "defi": True,
+    "event": True,
+    "mint": True,
+    "elonmusk": True,
+    "shib": True,
+    "ethereum": True,
+    "cmpn": True,
+    "earn": True,
+    "support": True,
+    "polygon": True,
+    "community": True,
+    "staking": True,
+    "sale": True,
+    "holders": True,
+    "tipmeacoffee": True,
+    "web3": True,
+    "winners": True,
+    "buy": True,
+    "avax": True,
+    "read": True,
+    "blockchain": True,
+    "glodao": True,
+    "wallet": True,
+    "money": True,
+    "doge": True,
+    "bnb": True,
+    "ido": True,
+    "campaign": True,
+    "presale": True,
+    "invite": True,
+    "metaverse": True,
+    "utc": True,
+    "ecosystem": True,
+    "gaming": True,
+    "vidt": True,
+    "token": True,
+    "top": True,
+    "fortprotocol": True,
+    "market": True,
+    "technology": True,
+    "join": True,
+    "eventdao": True,
+    "p2e": True,
+    "vote": True,
+    "social": True,
+    "bitcoin": True,
+    "cisla": True,
+    "altcoin": True,
+    "ama": True,
+    "claim": True,
+    "solana": True,
+    "tag": True,
+    "swap": True,
+    "socialfi": True,
+    "public": True,
+    "launch": True,
+    "game": True,
+    "exchange": True,
+    "glodaoofficial": True,
+    "profits": True,
+    "hypernation8": True,
+    "chance": True,
+    "usdt": True,
+    "meme": True,
+    "opensea": True,
+    "reward": True,
+    "governance": True,
+    "utility": True,
+    "finance": True,
+    "daoverse": True,
+}
+
 
 class TextProcessor:
     def stopwords(self):
-        stop_words = stopwords.words('english')
-        stop_words.extend([
-            'amp', 'dao', 'daos', 'rt', 'us', 'one',
-            'via', 'great', 'good','back','get','best',
-            'based','today','like','theres','dont',
-            'anywhere','done','time',
-            'hello','im', 'retweet'
-        ])
+        stop_words = stopwords.words("english")
+        stop_words.extend(
+            [
+                "amp",
+                "dao",
+                "daos",
+                "rt",
+                "us",
+                "one",
+                "via",
+                "great",
+                "good",
+                "back",
+                "get",
+                "best",
+                "based",
+                "today",
+                "like",
+                "theres",
+                "dont",
+                "anywhere",
+                "done",
+                "time",
+                "hello",
+                "im",
+                "retweet",
+            ]
+        )
         return stop_words
 
-    def lemmatization(self,text):
+    def lemmatization(self, text):
         # lemmatizer = WordNetLemmatizer()
         # return lemmatizer.lemmatize(text)
         return text
 
-    def preproc(self, text):
-        lines = [ l for l in text.split('\n') ]
-        lines = ' '.join(lines)
+    def preproc_line(self, line):
         converts = [
-            ('', ['[^a-zA-Z0-9 ]'], False),
-            ('cryptocurrency',['crypto', 'cryptocurrencies'],True),
-            ('cisla',['cryptoislanddao','crypto island dao'],True),
-            ('profit',['profits'],True),
-            ('airdrop',['giveaway','nftgiveaway', 'give away', 'airdrops','giveaways'], True),
-            ('bnb',['bnbchain', 'bsc'], True),
-            ('xhashtag',['xtag', 'xhashtagio'], True),
-            ('smartcontract', [
-                'smart contract',
-                'smart contracts',
-                'smartcontracts',
-            ], True),
-            ('elonmusk', ['elon musk'], True),
-            ('launch', ['launched','launching'], True),
-            ('companion', ['cmpn'], True),
-            ('hypernation8', ['hypernation'], True),
-            ('whitelist', ['wl'], True),
-            ('world', ['worlds'], True),
-            ('luna', ['lunac', 'lunc'], True),
-            ('tag', ['tg'], True),
-            ('event', ['events'], True),
-            ('',[r'http\S+', r'https\S+', '[0-9]+',],True),
-            ('dapp',['dapps'],True),
-            ('solana',['sol'],True),
-            ('reward',['rewards'],True),
-            ('token',['tokens'],True),
-            ('nft',['nfts'],True),
-            ('community',['nftcommunity'],True),
-            ('ethereum',[
-                'eth',
-                'ether'
-            ], True),
-            ('coin',['coins'],True),
-            ('project', ['projects'], True),
-            ('bitcoin', ['btc'], True),
-            (' ',['[ ]+'], False),
+            ("", ["[^a-zA-Z0-9 ]"], False),
+            ("cryptocurrency", ["crypto", "cryptocurrencies"], True),
+            ("cisla", ["cryptoislanddao", "crypto island dao"], True),
+            ("profit", ["profits"], True),
+            (
+                "airdrop",
+                ["giveaway", "nftgiveaway", "give away", "airdrops", "giveaways"],
+                True,
+            ),
+            ("bnb", ["bnbchain", "bsc"], True),
+            ("xhashtag", ["xtag", "xhashtagio"], True),
+            (
+                "smartcontract",
+                [
+                    "smart contract",
+                    "smart contracts",
+                    "smartcontracts",
+                ],
+                True,
+            ),
+            ("elonmusk", ["elon musk"], True),
+            ("launch", ["launched", "launching"], True),
+            ("companion", ["cmpn"], True),
+            ("hypernation8", ["hypernation"], True),
+            ("whitelist", ["wl"], True),
+            ("world", ["worlds"], True),
+            ("luna", ["lunac", "lunc"], True),
+            ("tag", ["tg"], True),
+            ("event", ["events"], True),
+            (
+                "",
+                [
+                    r"http\S+",
+                    r"https\S+",
+                    "[0-9]+",
+                ],
+                True,
+            ),
+            ("dapp", ["dapps"], True),
+            ("solana", ["sol"], True),
+            ("reward", ["rewards"], True),
+            ("token", ["tokens"], True),
+            ("nft", ["nfts"], True),
+            ("community", ["nftcommunity"], True),
+            ("ethereum", ["eth", "ether"], True),
+            ("coin", ["coins"], True),
+            ("project", ["projects"], True),
+            ("bitcoin", ["btc"], True),
+            (" ", ["[ ]+"], False),
         ]
 
-        for (dst,srcs,isWord) in converts:
+        for dst, srcs, isWord in converts:
             if isWord:
                 for src in srcs:
-                    lines = re.sub(f'^{src} ',f'{dst} ',lines, flags=re.IGNORECASE)
-                    lines = re.sub(f' {src} ',f' {dst} ',lines, flags=re.IGNORECASE)
-                    lines = re.sub(f' {src}$',f' {dst}',lines, flags=re.IGNORECASE)
+                    line = re.sub(f"^{src} ", f"{dst} ", line, flags=re.IGNORECASE)
+                    line = re.sub(f" {src} ", f" {dst} ", line, flags=re.IGNORECASE)
+                    line = re.sub(f" {src}$", f" {dst}", line, flags=re.IGNORECASE)
             else:
                 for src in srcs:
-                    lines = re.sub(src,dst,lines, flags=re.IGNORECASE)
+                    line = re.sub(src, dst, line, flags=re.IGNORECASE)
 
-        lines = re.findall('\w{2,}', lines)
-        lines = ' '.join([x for x in lines])
+        line = re.findall("\w{2,}", line)
+        line = " ".join([x for x in line])
 
-        return lines
+        return line
+
+    def preproc(self, text):
+        lines = [l for l in text.split("\n")]
+        lines = " ".join(lines)
+
+        return self.preproc_line(lines)
