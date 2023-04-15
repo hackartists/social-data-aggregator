@@ -1,6 +1,8 @@
-import textnets as tn
 import pandas as pd
+import textnets as tn
+
 import text_processor as tp
+
 
 class Network(tp.TextProcessor):
     def __init__(self, start_date, end_date, base="raw-data"):
@@ -27,22 +29,25 @@ class Network(tp.TextProcessor):
         month = start_date % 100
         year = int(start_date / 100)
         date = start_date
-        lines = []
+        df = []
         while date <= end_date:
-            filename = "{2}/{0}-{1:02d}.txt".format(year,month,self.base)
-            f = open(filename,"r")
-            lines = lines + f.read().split('\n')
-            f.close()
+            filename = "{2}/pd-{0}-{1:02d}.csv".format(year,month,self.base)
+            d = pd.read_csv(filename, engine='python' )
+            d= d[d['language'] == 'en']
+            df.append(d)
 
             month = month + 1
             if month == 13:
                 month = 1
                 year = year + 1
             date = (year*100) + month
+        self.data = pd.concat(df)
+        self.data = self.data['text'].map(self.preproc)
+        print(f'{self.base} data has been loaded')
 
-        self.text = lines
+        self.text = self.data.values.tolist()
 
-        return lines
+        return self.text
 
     def load(self):
         start_date = self.start_date
@@ -89,8 +94,10 @@ class Network(tp.TextProcessor):
     def make_graph(self):
         corpus = tn.Corpus(pd.Series(self.text))
         t = tn.Textnet(corpus.tokenized())
+        print('completed tokenization')
         words = t.project(node_type="term")
         g = words.graph
         g.vs["label"] = g.vs["id"]
+        print('it will make a graph model')
         g.write_gml('network-data/{0}.gml'.format(self.base))
         # words.save_graph(target=f'network-data/{self.base}.gml')
