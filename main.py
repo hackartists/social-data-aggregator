@@ -66,9 +66,9 @@ topics=20
 for (g,s,e) in generations:
     for base in ['reddit', 'raw-data']:
         n=network.Network(s,e,base)
-        n.load()
-        n.save()
-        n.run()
+        n.load_from_files()
+        n.make_graph()
+        print(f'Finished making a graph for {base}')
         # f = frequency.FrequencyMining(s, e, base)
         # f.run(f'output/freq-{base}-{g}.csv')
         # print(f'{g}: frequency has been completed.\n')
