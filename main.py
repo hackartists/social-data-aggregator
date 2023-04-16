@@ -76,35 +76,47 @@ max_topics=20
 
 
 for (g,s,e) in generations:
-    for base in ['raw-data']:
-        start_date = s
-        end_date = e
+    for base in ['reddit', 'raw-data']:
+        n=network.Network(s,e,base,rank=100)
+        n.load()
+        n.save()
+        n.make_graph_from_base()
+        print(f'Finished making a top-100 graph from {s} to {e}')
 
-        month = start_date % 100
-        end_month = end_date % 100
-        year = int(start_date / 100)
-        date = start_date
-        lines = ""
-        while date <= end_date:
-            n=network.Network(date,date,base)
-            n.load_from_files()
-            n.make_graph()
-            print(f'Finished making a graph for {date}')
+        n=network.Network(s,e,base,rank=30)
+        n.load()
+        n.save()
+        n.make_graph_from_base()
+        print(f'Finished making a top-30 graph from {s} to {e}')
 
-            month = month + 1
-            if month == 13:
-                month = 1
-                year = year + 1
-            date = (year*100) + month
-            print(f'Finished making a graph for {base}')
+        # start_date = s
+        # end_date = e
+
+        # month = start_date % 100
+        # end_month = end_date % 100
+        # year = int(start_date / 100)
+        # date = start_date
+        # lines = ""
+        # while date <= end_date:
+        #     n=network.Network(date,date,base)
+        #     n.load_from_files()
+        #     n.make_graph()
+        #     print(f'Finished making a graph for {date}')
+
+        #     month = month + 1
+        #     if month == 13:
+        #         month = 1
+        #         year = year + 1
+        #     date = (year*100) + month
+        #     print(f'Finished making a graph for {base}')
 
         # f = frequency.FrequencyMining(s, e, base)
         # f.run(f'output/freq-{base}-{g}.csv')
         # print(f'{g}: frequency has been completed.\n')
 
-        l = lda.LdaTopicModeling(s, e, base)
-        l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
-        print(f'{g}: LDA topic modeling has been completed.\n')
+        # l = lda.LdaTopicModeling(s, e, base)
+        # l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
+        # print(f'{g}: LDA topic modeling has been completed.\n')
 
 # r = reddit.Reddit(201604, 202212, "dao")
 # r.toCsv()
