@@ -1,23 +1,50 @@
-import re
-import pandas as pd
 import os
-from wordcloud import WordCloud
-import gensim
-from gensim.utils import simple_preprocess
-import nltk
-from nltk.corpus import stopwords
-import gensim.corpora as corpora
-from pprint import pprint
-import pyLDAvis.gensim_models as gensimvis
 import pickle
+import re
+from pprint import pprint
+import logging
+
+import gensim
+import gensim.corpora as corpora
+from gensim.models import Phrases
+from gensim.models.coherencemodel import CoherenceModel
+from gensim.utils import simple_preprocess
+from gensim.corpora.dictionary import Dictionary
+
+import nltk
+import pandas as pd
 import pyLDAvis
+import pyLDAvis.gensim_models as gensimvis
+from nltk.corpus import stopwords
+from wordcloud import WordCloud
+
 import text_processor as tp
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 class LdaTopicModeling(tp.TextProcessor):
     def __init__(self, start_date, end_date, base='raw-data'):
         self.start_date = start_date
         self.end_date = end_date
         self.base = base
+        self.coherence={
+            'c_v':[],
+            'u_mass':[],
+            'c_uci':[],
+            'c_npmi':[],
+        }
+        self.coherence_per_topics={
+            'c_v':[],
+            'u_mass':[],
+            'c_uci':[],
+            'c_npmi':[],
+        }
+
+    def load_from_bin(self, filename):
+        self.lda_model = pickle.load(filename)
 
     def load(self):
         start_date = self.start_date
@@ -52,7 +79,7 @@ class LdaTopicModeling(tp.TextProcessor):
         wordcloud.generate(long_string)
         wordcloud.to_image()
 
-    def analysis(self, num_topics):
+    def prepare(self):
         stop_words = self.stopwords()
         stop_words.extend(['ethereum','bitcoin','binance','solana','blockchain'])
 
@@ -73,31 +100,35 @@ class LdaTopicModeling(tp.TextProcessor):
         self.texts = data_words
         self.corpus = [self.id2word.doc2bow(text) for text in self.texts]
 
-        self.lda_model = gensim.models.LdaMulticore(corpus=self.corpus,
+    def analysis(self, num_topics):
+        lda_model = gensim.models.LdaMulticore(corpus=self.corpus,
                                                     id2word=self.id2word,
-                                                    num_topics=num_topics,
-                                                    workers=7)
-        # pprint(lda_model.print_topics())
-        # doc_lda = lda_model[corpus]
+                                                    num_topics=num_topics)
+        return lda_model
 
-    def visualize(self, filename):
-        # pyLDAvis.enable_notebook()
-
+    def visualize(self, filename, lda_model):
         LDAvis_data_filepath = os.path.join(filename)
 
-        if 1 == 1:
-            LDAvis_prepared = gensimvis.prepare(self.lda_model, self.corpus, self.id2word)
-            with open(LDAvis_data_filepath, 'wb') as f:
-                pickle.dump(LDAvis_prepared, f)
-
-        with open(LDAvis_data_filepath, 'rb') as f:
-            LDAvis_prepared = pickle.load(f)
+        LDAvis_prepared = gensimvis.prepare(lda_model, self.corpus, self.id2word)
+        with open(LDAvis_data_filepath, 'wb') as f:
+            pickle.dump(LDAvis_prepared, f)
 
         pyLDAvis.save_html(LDAvis_prepared, f'{filename}.html')
 
-    def run(self, num_topics, filename):
+    def run(self, min_topics, max_topics, filename):
         self.load()
         self.preprocessing()
-        self.analysis(num_topics)
-        self.visualize(filename)
+        self.prepare()
+        logging.info('finished preparing')
 
+        for n in range(min_topics, max_topics+1, 1):
+            lda_model = self.analysis(n)
+            self.visualize(f'{filename}_{n}', lda_model)
+            for t in ['c_v','u_mass','c_uci','c_npmi']:
+                coherencemodel = CoherenceModel(model=lda_model, texts=self.texts, dictionary=self.id2word, coherence=t)
+                self.coherence[t].append(coherencemodel.get_coherence())
+                self.coherence_per_topics[t].append(coherencemodel.get_coherence_per_topic())
+                logging.info(f'finished {t} coherence measurement')
+            print(self.coherence)
+            print(self.coherence_per_topics)
+            logging.info(f'finished {n}-topics analysis')

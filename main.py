@@ -1,4 +1,5 @@
-# import os
+import os
+import logging
 # import re
 
 # import nltk
@@ -13,6 +14,11 @@ import lda
 import warnings
 import reddit
 import network
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 # files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
@@ -59,22 +65,27 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 # generations = [('gen1',201604,201801),('gen2',201802,202003),('gen3',202004,202212)]
 # generations = [('gen3',202004,202212)]
 generations = [('gen',201604,202212)]
+if os.environ['ENV'] == 'TEST':
+    generations = [('gen',201604,201604)]
+    logging.info('For testing-purpose, generations will be restricted to 201604')
+
 # d = datapool.DataPool(201604,202212)
 # d.load()
-topics=20
+min_topics=2
+max_topics=20
 
 for (g,s,e) in generations:
     for base in ['reddit', 'raw-data']:
-        n=network.Network(s,e,base)
-        n.load_from_files()
-        n.make_graph()
-        print(f'Finished making a graph for {base}')
+        # n=network.Network(s,e,base)
+        # n.load_from_files()
+        # n.make_graph()
+        # print(f'Finished making a graph for {base}')
         # f = frequency.FrequencyMining(s, e, base)
         # f.run(f'output/freq-{base}-{g}.csv')
         # print(f'{g}: frequency has been completed.\n')
-        # l = lda.LdaTopicModeling(s, e, base)
-        # l = l.run(topics, f'output/lda-{base}-{g}')
-        # print(f'{g}: LDA topic modeling has been completed.\n')
+        l = lda.LdaTopicModeling(s, e, base)
+        l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
+        print(f'{g}: LDA topic modeling has been completed.\n')
 
 # r = reddit.Reddit(201604, 202212, "dao")
 # r.toCsv()
