@@ -102,9 +102,10 @@ for (g,s,e) in generations:
         # f.run(f'output/freq-{base}-{g}.csv')
         # print(f'{g}: frequency has been completed.\n')
 
-        # l = lda.LdaTopicModeling(s, e, base)
-        # l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
-        # print(f'{g}: LDA topic modeling has been completed.\n')
+        if base == 'raw-data':
+            l = lda.LdaTopicModeling(s, e, base)
+            l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
+            print(f'{g}: LDA topic modeling has been completed.\n')
 
 # r = reddit.Reddit(201604, 202212, "dao")
 # r.toCsv()
