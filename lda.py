@@ -103,7 +103,7 @@ class LdaTopicModeling(tp.TextProcessor):
     def analysis(self, num_topics):
         lda_model = gensim.models.LdaMulticore(corpus=self.corpus,
                                                     id2word=self.id2word,
-                                                    num_topics=num_topics)
+                                                    num_topics=num_topics,workers=7)
         return lda_model
 
     def visualize(self, filename, lda_model):
