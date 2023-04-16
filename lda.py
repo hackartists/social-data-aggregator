@@ -2,7 +2,7 @@ import os
 import pickle
 import re
 from pprint import pprint
-import logging
+# import logging
 
 import gensim
 import gensim.corpora as corpora
@@ -20,10 +20,10 @@ from wordcloud import WordCloud
 
 import text_processor as tp
 
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
+# logging.basicConfig(
+#     format='%(asctime)s %(levelname)-8s %(message)s',
+#     level=logging.INFO,
+#     datefmt='%Y-%m-%d %H:%M:%S')
 
 class LdaTopicModeling(tp.TextProcessor):
     def __init__(self, start_date, end_date, base='raw-data'):
@@ -119,7 +119,7 @@ class LdaTopicModeling(tp.TextProcessor):
         self.load()
         self.preprocessing()
         self.prepare()
-        logging.info('finished preparing')
+        print('finished preparing')
 
         for n in range(min_topics, max_topics+1, 1):
             lda_model = self.analysis(n)
@@ -128,7 +128,7 @@ class LdaTopicModeling(tp.TextProcessor):
                 coherencemodel = CoherenceModel(model=lda_model, texts=self.texts, dictionary=self.id2word, coherence=t)
                 self.coherence[t].append(coherencemodel.get_coherence())
                 self.coherence_per_topics[t].append(coherencemodel.get_coherence_per_topic())
-                logging.info(f'finished {t} coherence measurement')
+                print(f'finished {t} coherence measurement')
             print(self.coherence)
             print(self.coherence_per_topics)
-            logging.info(f'finished {n}-topics analysis')
+            print(f'finished {n}-topics analysis')

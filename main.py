@@ -1,5 +1,5 @@
 import os
-import logging
+# import logging
 # import re
 
 # import nltk
@@ -15,10 +15,10 @@ import warnings
 import reddit
 import network
 
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
+# logging.basicConfig(
+#     format='%(asctime)s %(levelname)-8s %(message)s',
+#     level=logging.INFO,
+#     datefmt='%Y-%m-%d %H:%M:%S')
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 # files = [f for f in os.listdir(".") if os.path.isfile(f) & f.endswith(".txt") & f.startswith("20")]
@@ -67,7 +67,7 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 generations = [('gen',201604,202212)]
 if os.environ['ENV'] == 'TEST':
     generations = [('gen',201604,201604)]
-    logging.info('For testing-purpose, generations will be restricted to 201604')
+    # logging.info('For testing-purpose, generations will be restricted to 201604')
 
 # d = datapool.DataPool(201604,202212)
 # d.load()
