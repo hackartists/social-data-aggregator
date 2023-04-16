@@ -69,12 +69,12 @@ class Network(lda.LdaTopicModeling):
     def make_graph(self):
         self.prepare()
         self.texts = [' '.join(text) for text in self.texts]
-        corpus = tn.Corpus(pd.Series(self.texts))
+        corpus = tn.Corpus(pd.Series(self.texts, dtype='float64'))
         t = tn.Textnet(corpus.tokenized())
         print('completed tokenization')
         words = t.project(node_type="term")
         g = words.graph
         g.vs["label"] = g.vs["id"]
         print('it will make a graph model')
-        g.write_gml('network-data/{0}.gml'.format(self.base))
+        g.write_gml('network-data/{0}-{1}-{2}.gml'.format(self.base, self.start_date, self.end_date))
         # words.save_graph(target=f'network-data/{self.base}.gml')

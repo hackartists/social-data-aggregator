@@ -74,12 +74,29 @@ if os.environ['ENV'] == 'TEST':
 min_topics=2
 max_topics=20
 
+
 for (g,s,e) in generations:
     for base in ['reddit', 'raw-data']:
-        n=network.Network(s,e,base)
-        n.load_from_files()
-        n.make_graph()
-        print(f'Finished making a graph for {base}')
+        start_date = s
+        end_date = e
+
+        month = start_date % 100
+        end_month = end_date % 100
+        year = int(start_date / 100)
+        date = start_date
+        lines = ""
+        while date <= end_date:
+            n=network.Network(date,date,base)
+            n.load_from_files()
+            n.make_graph()
+            print(f'Finished making a graph for {date}')
+
+            month = month + 1
+            if month == 13:
+                month = 1
+                year = year + 1
+            date = (year*100) + month
+            print(f'Finished making a graph for {base}')
 
         # f = frequency.FrequencyMining(s, e, base)
         # f.run(f'output/freq-{base}-{g}.csv')
