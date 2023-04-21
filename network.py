@@ -24,19 +24,15 @@ class Network(lda.LdaTopicModeling):
             self.filter = tp.dict_by_rank('reddit', self.rank)
         super().__init__(start_date, end_date, base)
 
-    def load_from_base(self):
-        f = open(f'network-data/{self.base}.txt', 'r')
+    def load_from_base(self,from_rank):
+        f = open(f'network-data/{self.base}-{from_rank}.txt', 'r')
         self.texts = f.read().split('\n')
         f.close()
-        if self.rank != 100:
+        if self.rank != from_rank:
             self.texts = [self.preprocessing(t) for t in self.texts]
             self.save()
 
         return self.texts
-
-    def load_from_files(self):
-        self.load()
-        self.preprocessing()
 
     def load(self):
         start_date = self.start_date
@@ -47,13 +43,13 @@ class Network(lda.LdaTopicModeling):
         date = start_date
         lines = []
         while date <= end_date:
-            filename = "{2}/{0}-{1:02d}.txt".format(year,month,self.base)
-            f = open(filename,"r")
-            for l in f.read().split('\n'):
+            filename = "{2}/pd-{0}-{1:02d}.csv".format(year,month,self.base)
+            d = pd.read_csv(filename, engine='python' )
+            d= d[d['language'] == 'en']
+            for l in d['text'].map(self.preproc).values.tolist():
                 l = self.preprocessing(l)
-                if l != '' and ' ' in l:
+                if l != '':
                     lines = lines + [l]
-            f.close()
 
             month = month + 1
             if month == 13:
@@ -66,8 +62,7 @@ class Network(lda.LdaTopicModeling):
         return lines
 
     def preprocessing(self, text):
-        t = self.preproc_line(text)
-        return ' '.join([ w for w in t.split(' ') if w in self.filter and self.filter[w] ]) 
+        return ' '.join([ w for w in text.split(' ') if w in self.filter and self.filter[w] ]) 
 
     def save(self):
         f = open(f'network-data/{self.base}-{self.rank}.txt', 'w')
@@ -76,7 +71,7 @@ class Network(lda.LdaTopicModeling):
 
     def make_graph_from_base(self):
         corpus = tn.Corpus(pd.Series(self.texts))
-        t = tn.Textnet(corpus.tokenized(stem=False))
+        t = tn.Textnet(corpus.tokenized(stem=False,remove_stop_words=False,remove_urls=False,remove_numbers=True,remove_punctuation=False,lower=False))
         print('completed tokenization')
         words = t.project(node_type="term")
         g = words.graph

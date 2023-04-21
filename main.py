@@ -77,17 +77,18 @@ max_topics=20
 
 for (g,s,e) in generations:
     for base in ['reddit', 'raw-data']:
+        print(f'starting {base}')
         n=network.Network(s,e,base,rank=100)
         n.load()
         n.save()
-        n.make_graph_from_base()
-        print(f'Finished making a top-100 graph from {s} to {e}')
+        # n.make_graph_from_base()
+        # print(f'Finished making a top-100 graph from {s} to {e}')
 
         n=network.Network(s,e,base,rank=30)
-        n.load()
+        n.load_from_base(100)
         n.save()
-        n.make_graph_from_base()
-        print(f'Finished making a top-30 graph from {s} to {e}')
+        # n.make_graph_from_base()
+        # print(f'Finished making a top-30 graph from {s} to {e}')
 
         # start_date = s
         # end_date = e
@@ -115,6 +116,7 @@ for (g,s,e) in generations:
         # print(f'{g}: frequency has been completed.\n')
 
         # l = lda.LdaTopicModeling(s, e, base)
+        # l.load()
         # l = l.run(min_topics,max_topics, f'output/lda-{base}-{g}')
         # print(f'{g}: LDA topic modeling has been completed.\n')
 

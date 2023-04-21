@@ -218,6 +218,7 @@ def dict_by_rank(typ,count):
     ret = {}
     for i in range(0,count,1):
         ret[top_100[typ][i]] = True
+        print(f'{i}:{top_100[typ][i]},{ret[top_100[typ][i]]}')
 
     return ret
 
@@ -324,7 +325,7 @@ class TextProcessor:
         line = re.findall("\w{2,}", line)
         line = " ".join([x for x in line])
 
-        return line
+        return line.lower()
 
     def preproc(self, text):
         lines = [l for l in text.split("\n")]

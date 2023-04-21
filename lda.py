@@ -56,10 +56,12 @@ class LdaTopicModeling(tp.TextProcessor):
         date = start_date
         lines = ""
         df = []
+        num=''
         while date <= end_date:
             filename = "{2}/pd-{0}-{1:02d}.csv".format(year,month,self.base)
             d = pd.read_csv(filename, engine='python' )
             d= d[d['language'] == 'en']
+            num= num + '{0}-{1:02d},{2}\n'.format(year,month,len(d.index))
             df.append(d)
 
             month = month + 1
@@ -67,6 +69,7 @@ class LdaTopicModeling(tp.TextProcessor):
                 month = 1
                 year = year + 1
             date = (year*100) + month
+        print(num)
         self.data = pd.concat(df)
 
     def preprocessing(self):
