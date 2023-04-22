@@ -76,17 +76,16 @@ max_topics=20
 
 
 for (g,s,e) in generations:
-    for base in ['reddit', 'raw-data']:
+    for base in ['raw-data']:
         print(f'starting {base}')
         n=network.Network(s,e,base,rank=100)
-        n.load()
-        n.save()
-        # n.make_graph_from_base()
+        n.load_from_base(100)
+        n.make_graph_from_base()
         # print(f'Finished making a top-100 graph from {s} to {e}')
 
-        n=network.Network(s,e,base,rank=30)
-        n.load_from_base(100)
-        n.save()
+        # n=network.Network(s,e,base,rank=30)
+        # n.load_from_base(100)
+        # n.save()
         # n.make_graph_from_base()
         # print(f'Finished making a top-30 graph from {s} to {e}')
 

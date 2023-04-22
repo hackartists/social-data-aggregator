@@ -56,6 +56,7 @@ class Network(lda.LdaTopicModeling):
                 month = 1
                 year = year + 1
             date = (year*100) + month
+            print(f'finished loading {date}')
 
         self.texts = lines
 
